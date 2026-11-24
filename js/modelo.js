@@ -49,3 +49,31 @@ function grausDiaOmetto(tmax, tmin, tb, TB) {
   // Caso 5: começa abaixo de tb e passa de TB
   return ((tmax - tb) ** 2 - (tmax - TB) ** 2) / (2 * amplitude);
 }
+
+// Balanço hídrico de Thornthwaite e Mather (1955), dia a dia.
+// chuva e etc: listas com um valor por dia (mm)
+// cad: capacidade de água disponível do solo (mm); no consenso, 100
+// Devolve uma lista com o excesso hídrico de cada dia (mm).
+// O balanço começa com o solo cheio (armazenamento = cad).
+function balancoThornthwaiteMather(chuva, etc, cad) {
+  let armazenamento = cad;   // água no solo hoje (mm)
+  let negativoAcumulado = 0; // soma dos déficits (sempre <= 0)
+  const excesso = [];        // resultado: um valor por dia
+
+  for (let i = 0; i < chuva.length; i++) {
+    const saldo = chuva[i] - etc[i];   // P − ETc do dia
+
+    if (saldo < 0) {
+      // Dia seco: o solo perde água pela curva exponencial
+      negativoAcumulado = negativoAcumulado + saldo;
+      armazenamento = cad * Math.exp(negativoAcumulado / cad);
+      excesso.push(0);
+    } else {
+      // Dia com sobra: o solo enche; o que passar da CAD é excesso
+      excesso.push(Math.max(armazenamento + saldo - cad, 0));
+      armazenamento = Math.min(cad, armazenamento + saldo);
+      negativoAcumulado = cad * Math.log(armazenamento / cad);
+    }
+  }
+  return excesso;
+}
