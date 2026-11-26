@@ -3,13 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Previsão da florada da laranjeira</title>
+  <title>Previsão da florada – laranja Pera</title>
   <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
-  <h1>Previsão da florada da laranjeira</h1>
-  <p>Em construção.</p>
+  <header>
+    <h1>Previsão da florada</h1>
+    <p>Laranja Pera · indução pela seca e soma de graus-dia</p>
+  </header>
+
+  <main>
+    <section class="cartao">
+      <h2>1. Seus dados</h2>
+
+      <label for="arquivo">Planilha do clima (CSV)</label>
+      <input type="file" id="arquivo" accept=".csv">
+
+      <label for="tipo">Tipo de pomar</label>
+      <select id="tipo">
+        <option value="sequeiro">Sequeiro (sem irrigação)</option>
+        <option value="irrigado">Irrigado por gotejo</option>
+      </select>
+
+      <button id="botao-prever">Prever a florada</button>
+    </section>
+
+    <section class="cartao" id="resultado" hidden>
+      <h2>2. Resultado</h2>
+      <p id="texto-resultado"></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Iniciação Científica FAPESP · ESALQ/USP · Desenvolvido com auxílio de IA (Claude)</p>
+  </footer>
+
   <script src="js/modelo.js"></script>
+  <script src="js/leitura.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
