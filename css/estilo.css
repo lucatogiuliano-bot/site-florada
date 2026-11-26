@@ -67,3 +67,7 @@ footer {
   color: #6b6b5e;
   padding: 16px;
 }
+#texto-resultado {
+  white-space: pre-line;    /* respeita as quebras de linha (\n) do texto */
+  font-size: 1.05rem;
+}
