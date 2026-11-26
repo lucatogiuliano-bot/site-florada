@@ -59,10 +59,19 @@ function calcularPrevisao(dados, tipo) {
   const ultimoDia = dados.datas[dados.datas.length - 1];
   const anoCompleto = ultimoDia >= ano + '-12-31';
 
-  // Caso normal: o modelo achou a florada
+  // Caso normal: o modelo achou a florada → data + faixas
   if (!r.borda) {
-    return 'Liberação da florada (primeiro dia com excesso de água): ' + formatarData(r.liberacao) + '\n' +
-           'Florada prevista (plena florada, BBCH 65): ' + formatarData(r.florada);
+    const f = FAIXAS_PREVISAO[tipo];
+    let texto = 'Liberação da florada (primeiro dia com excesso de água): ' + formatarData(r.liberacao) + '\n' +
+                'Florada prevista (plena florada, BBCH 65): ' + formatarData(r.florada) + '\n\n' +
+                'Faixa provável (5 em cada 10 floradas): de ' + formatarData(somarDias(r.florada, -f.provavel[0])) +
+                ' a ' + formatarData(somarDias(r.florada, f.provavel[1])) + '\n' +
+                'Faixa ampla (8 em cada 10 floradas): de ' + formatarData(somarDias(r.florada, -f.ampla[0])) +
+                ' a ' + formatarData(somarDias(r.florada, f.ampla[1]));
+    if (tipo === 'sequeiro') {
+      texto += '\n\nNo sequeiro, o modelo costuma prever um pouco tarde: a florada tende a vir antes da data prevista.';
+    }
+    return texto;
   }
 
   // Ano inteiro e mesmo assim não chegou: regra de borda do protocolo
@@ -94,7 +103,7 @@ function verificarPeriodo(datas) {
                     'A sua começa em ' + formatarData(datas[0]) + '.');
   }
   for (let i = 1; i < datas.length; i++) {
-    if (diaSeguinte(datas[i - 1]) !== datas[i]) {
+    if (somarDias(datas[i - 1], 1) !== datas[i]) {
       throw new Error('falta dia na planilha: depois de ' + formatarData(datas[i - 1]) +
                       ' vem ' + formatarData(datas[i]) + '.');
     }
@@ -104,10 +113,11 @@ function verificarPeriodo(datas) {
   }
 }
 
-// '2012-02-28' → '2012-02-29' (usa UTC para não ter problema de fuso horário)
-function diaSeguinte(iso) {
+// Soma (ou subtrai, se n for negativo) n dias a uma data 'AAAA-MM-DD'
+// Usa UTC para não ter problema de fuso horário
+function somarDias(iso, n) {
   const d = new Date(iso + 'T00:00:00Z');
-  d.setUTCDate(d.getUTCDate() + 1);
+  d.setUTCDate(d.getUTCDate() + n);
   return d.toISOString().slice(0, 10);
 }
 

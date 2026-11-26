@@ -137,3 +137,9 @@ const PARAMETROS_CONSENSO = {
   kcIrrigado: 0.73,      // kc da GL
   fracaoMolhada: 0.35    // fração molhada do gotejo
 };
+// Faixas de erro da previsão (protocolo, seção R42)
+// [dias antes, dias depois] da data prevista
+const FAIXAS_PREVISAO = {
+  irrigado: { provavel: [11, 12], ampla: [20, 24] },
+  sequeiro: { provavel: [24, 1],  ampla: [35, 10] }
+};
