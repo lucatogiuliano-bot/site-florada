@@ -96,3 +96,55 @@ function balancoGotejoDuasFracoes(chuva, irrigacao, etc, cad, fracaoMolhada) {
     fracaoMolhada * e + (1 - fracaoMolhada) * excessoEntrelinha[i]
   );
 }
+// Previsão da florada pelo modelo de consenso.
+// datas: lista de datas do ano no formato 'AAAA-MM-DD' (uma por dia, em ordem)
+// excesso: excesso hídrico de cada dia (mm), do balanço do pomar
+// gd: graus-dia de cada dia
+// p: parâmetros do consenso
+// Devolve { liberacao, florada } (datas 'AAAA-MM-DD'), com null quando não há previsão.
+function preverFlorada(datas, excesso, gd, p) {
+  // 1. Posição do início (23/03 do ano)
+  const ano = datas[0].slice(0, 4);
+  const inicio = datas.indexOf(ano + '-' + p.inicio);
+  if (inicio === -1) {
+    return { liberacao: null, florada: null };
+  }
+
+  // 2 e 3. Liberação: primeiro dia com excesso > 0 depois da indução
+  let liberacao = -1;
+  for (let i = inicio + p.diasInducao; i < datas.length; i++) {
+    if (excesso[i] > 0) {
+      liberacao = i;
+      break;
+    }
+  }
+  if (liberacao === -1) {
+    return { liberacao: null, florada: null };
+  }
+
+  // 4. Defasagem e soma de graus-dia até a soma alvo
+  let soma = 0;
+  for (let i = liberacao + p.defasagem; i < datas.length; i++) {
+    soma = soma + gd[i];
+    if (soma >= p.somaGD) {
+      return { liberacao: datas[liberacao], florada: datas[i] };
+    }
+  }
+
+  // A soma não chegou ao alvo até o fim da série
+  return { liberacao: datas[liberacao], florada: null };
+}
+
+// Parâmetros do modelo de consenso (protocolo v78)
+const PARAMETROS_CONSENSO = {
+  inicio: '03-23',     // início da contagem
+  diasInducao: 90,     // janela de indução (até 21/06)
+  defasagem: 14,       // dias entre a liberação e o início da soma térmica
+  somaGD: 200,         // graus-dia (Ometto, Tb 13 °C, TB 36 °C) até a florada
+  tb: 13,
+  TB: 36,
+  cad: 100,            // mm
+  etcSequeiro: 0.7,    // ETc = 0,7 × ETo no sequeiro
+  kcIrrigado: 0.73,    // Kc do pomar irrigado
+  fracaoMolhada: 0.35  // gotejo
+};

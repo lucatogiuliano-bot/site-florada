@@ -38,6 +38,20 @@ fetch('casos_teste.json')
         }
       }
       console.log(caso.nome + ' | excesso hídrico (' + caso.tipo + '): ' + excCertos + ' de ' + caso.dias.length + ' dias certos');
-    }
+
+      // ---------- Teste 3: previsão da florada ----------
+      const datas = caso.dias.map(dia => dia.data);
+      const gd = caso.dias.map(dia => grausDiaOmetto(dia.tmax, dia.tmin, 13, 36));
+      const previsao = preverFlorada(datas, excesso, gd, PARAMETROS_CONSENSO);
+
+      const liberacaoOk = previsao.liberacao === caso.esperado.liberacao;
+      const floradaOk = previsao.florada === caso.esperado.florada_prevista;
+
+      console.log(
+        caso.nome + ' | liberação ' + previsao.liberacao + (liberacaoOk ? ' ✔' : ' ✘ esperado ' + caso.esperado.liberacao) +
+        ' | florada ' + previsao.florada + (floradaOk ? ' ✔' : ' ✘ esperado ' + caso.esperado.florada_prevista)
+      );
+
+    } // ← fim do for (const caso ...): tudo dos testes fica ANTES desta chave
   })
   .catch(erro => console.error('Erro:', erro));
