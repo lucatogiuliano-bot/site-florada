@@ -103,48 +103,37 @@ function balancoGotejoDuasFracoes(chuva, irrigacao, etc, cad, fracaoMolhada) {
 // p: parâmetros do consenso
 // Devolve { liberacao, florada } (datas 'AAAA-MM-DD'), com null quando não há previsão.
 function preverFlorada(datas, excesso, gd, p) {
-  // 1. Posição do início (23/03 do ano)
   const ano = datas[0].slice(0, 4);
+  const dataBorda = ano + '-10-31';           // regra de borda do protocolo (8.12)
   const inicio = datas.indexOf(ano + '-' + p.inicio);
-  if (inicio === -1) {
-    return { liberacao: null, florada: null };
-  }
+  if (inicio === -1) return { liberacao: null, florada: null, borda: false };
 
-  // 2 e 3. Liberação: primeiro dia com excesso > 0 depois da indução
-  let liberacao = -1;
+  // 1. Liberação: primeiro dia com excesso de água depois dos 90 dias de indução
+  let liberacao = null;
   for (let i = inicio + p.diasInducao; i < datas.length; i++) {
-    if (excesso[i] > 0) {
-      liberacao = i;
-      break;
-    }
+    if (excesso[i] > 0) { liberacao = i; break; }
   }
-  if (liberacao === -1) {
-    return { liberacao: null, florada: null };
-  }
+  if (liberacao === null) return { liberacao: null, florada: dataBorda, borda: true };
 
-  // 4. Defasagem e soma de graus-dia até a soma alvo
+  // 2. Soma de graus-dia depois da defasagem
   let soma = 0;
   for (let i = liberacao + p.defasagem; i < datas.length; i++) {
-    soma = soma + gd[i];
-    if (soma >= p.somaGD) {
-      return { liberacao: datas[liberacao], florada: datas[i] };
-    }
+    soma += gd[i];
+    if (soma >= p.somaGD) return { liberacao: datas[liberacao], florada: datas[i], borda: false };
   }
 
-  // A soma não chegou ao alvo até o fim da série
-  return { liberacao: datas[liberacao], florada: null };
+  // 3. Não fechou os 200 GD até o fim dos dados: data de borda
+  return { liberacao: datas[liberacao], florada: dataBorda, borda: true };
 }
-
-// Parâmetros do modelo de consenso (protocolo v78)
 const PARAMETROS_CONSENSO = {
-  inicio: '03-23',     // início da contagem
-  diasInducao: 90,     // janela de indução (até 21/06)
-  defasagem: 14,       // dias entre a liberação e o início da soma térmica
-  somaGD: 200,         // graus-dia (Ometto, Tb 13 °C, TB 36 °C) até a florada
-  tb: 13,
-  TB: 36,
-  cad: 100,            // mm
-  etcSequeiro: 0.7,    // ETc = 0,7 × ETo no sequeiro
-  kcIrrigado: 0.73,    // Kc do pomar irrigado
-  fracaoMolhada: 0.35  // gotejo
+  inicio: '03-23',       // início da indução (23/03)
+  diasInducao: 90,       // dias de indução
+  defasagem: 14,         // dias entre a liberação e o início da soma térmica
+  somaGD: 200,           // graus-dia até a antese
+  tb: 13,                // temperatura basal inferior
+  TB: 36,                // temperatura basal superior
+  cad: 100,              // capacidade de água disponível (mm)
+  etcSequeiro: 0.7,      // ETc = 0,7 × ETo no sequeiro
+  kcIrrigado: 0.73,      // kc da GL
+  fracaoMolhada: 0.35    // fração molhada do gotejo
 };
