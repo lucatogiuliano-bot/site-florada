@@ -77,3 +77,22 @@ function balancoThornthwaiteMather(chuva, etc, cad) {
   }
   return excesso;
 }
+// Balanço hídrico do gotejo com duas frações.
+// chuva, irrigacao, etc: listas com um valor por dia (mm)
+//   (irrigação em mm sobre a área total do pomar)
+// cad: capacidade de água disponível (mm); no consenso, 100
+// fracaoMolhada: parte da área molhada pelos gotejadores; no consenso, 0,35
+// Devolve o excesso hídrico do pomar em cada dia (mm).
+function balancoGotejoDuasFracoes(chuva, irrigacao, etc, cad, fracaoMolhada) {
+  // Faixa molhada: chuva + irrigação concentrada nessa faixa
+  const aguaFaixaMolhada = chuva.map((c, i) => c + irrigacao[i] / fracaoMolhada);
+  const excessoMolhada = balancoThornthwaiteMather(aguaFaixaMolhada, etc, cad);
+
+  // Entrelinha: só a chuva
+  const excessoEntrelinha = balancoThornthwaiteMather(chuva, etc, cad);
+
+  // Média ponderada pela área de cada faixa
+  return excessoMolhada.map((e, i) =>
+    fracaoMolhada * e + (1 - fracaoMolhada) * excessoEntrelinha[i]
+  );
+}

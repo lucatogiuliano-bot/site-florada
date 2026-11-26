@@ -15,25 +15,29 @@ fetch('casos_teste.json')
       }
       console.log(caso.nome + ' | graus-dia: ' + gdCertos + ' de ' + caso.dias.length + ' dias certos');
 
-      // ---------- Teste 2: balanço hídrico (só sequeiro) ----------
+      // ---------- Teste 2: balanço hídrico ----------
+      const chuva = caso.dias.map(dia => dia.chuva);
+      let excesso;
+
       if (caso.tipo === 'sequeiro') {
-        // monta as listas de chuva e ETc do ano
-        const chuva = caso.dias.map(dia => dia.chuva);
         const etc = caso.dias.map(dia => 0.7 * dia.eto);
-
-        const excesso = balancoThornthwaiteMather(chuva, etc, 100);
-
-        let excCertos = 0;
-        for (let i = 0; i < caso.dias.length; i++) {
-          const esperado = caso.dias[i].excesso_esperado;
-          if (Math.abs(excesso[i] - esperado) <= 0.001) {
-            excCertos = excCertos + 1;
-          } else {
-            console.log('Excesso diferente em ' + caso.dias[i].data + ': calculado ' + excesso[i] + ', esperado ' + esperado);
-          }
-        }
-        console.log(caso.nome + ' | excesso hídrico: ' + excCertos + ' de ' + caso.dias.length + ' dias certos');
+        excesso = balancoThornthwaiteMather(chuva, etc, 100);
+      } else {
+        const irrigacao = caso.dias.map(dia => dia.irrigacao);
+        const etc = caso.dias.map(dia => 0.73 * dia.eto);
+        excesso = balancoGotejoDuasFracoes(chuva, irrigacao, etc, 100, 0.35);
       }
+
+      let excCertos = 0;
+      for (let i = 0; i < caso.dias.length; i++) {
+        const esperado = caso.dias[i].excesso_esperado;
+        if (Math.abs(excesso[i] - esperado) <= 0.001) {
+          excCertos = excCertos + 1;
+        } else {
+          console.log('Excesso diferente em ' + caso.dias[i].data + ': calculado ' + excesso[i] + ', esperado ' + esperado);
+        }
+      }
+      console.log(caso.nome + ' | excesso hídrico (' + caso.tipo + '): ' + excCertos + ' de ' + caso.dias.length + ' dias certos');
     }
   })
   .catch(erro => console.error('Erro:', erro));
