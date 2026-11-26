@@ -143,3 +143,8 @@ const FAIXAS_PREVISAO = {
   irrigado: { provavel: [11, 12], ampla: [20, 24] },
   sequeiro: { provavel: [24, 1],  ampla: [35, 10] }
 };
+// Data de referência sem modelo (data fixa de calibração do protocolo, seção R43)
+const DATA_REFERENCIA = {
+  irrigado: { dia: '08-05', texto: 'mediana das floradas irrigadas da calibração' },
+  sequeiro: { dia: '09-19', texto: 'mediana das floradas de sequeiro da calibração' }
+};

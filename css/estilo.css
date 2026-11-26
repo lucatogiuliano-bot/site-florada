@@ -71,3 +71,100 @@ footer {
   white-space: pre-line;    /* respeita as quebras de linha (\n) do texto */
   font-size: 1.05rem;
 }
+/* ---------- Data de referência (passo 1.6) ---------- */
+.marcador-referencia {
+  background: #8a8a7a;
+  width: 3px;
+}
+.cor-referencia { background: #8a8a7a; }
+
+.comparacao {
+  border-top: 1px solid #ece8dc;
+  margin-top: 12px;
+  padding-top: 4px;
+}
+/* ---------- Resultado (passo 1.5) ---------- */
+.rotulo {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6b6b5e;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.data-grande {
+  margin: 4px 0 16px;
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #2f5d2f;
+}
+
+.linha-tempo {
+  position: relative;
+  height: 28px;
+  background: #ece8dc;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+.faixa {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 14px;
+}
+.faixa-ampla    { background: #f6c68f; }
+.faixa-provavel { background: #e07b1a; }
+
+.marcador {
+  position: absolute;
+  top: -6px;
+  width: 4px;
+  height: 40px;
+  margin-left: -2px;
+  background: #2f5d2f;
+  border-radius: 2px;
+}
+
+.legenda {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+}
+.legenda li { margin: 4px 0; }
+
+.cor {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  margin-right: 8px;
+  vertical-align: -2px;
+}
+.cor-provavel { background: #e07b1a; }
+.cor-ampla    { background: #f6c68f; }
+
+.detalhe {
+  font-size: 0.95rem;
+  color: #4a4a40;
+}
+
+.aviso {
+  background: #fdf0e1;
+  border-left: 4px solid #e07b1a;
+  padding: 10px 12px;
+  border-radius: 6px;
+}
+
+.progresso {
+  height: 14px;
+  background: #ece8dc;
+  border-radius: 7px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.progresso-feito {
+  height: 100%;
+  background: #2f5d2f;
+}
